@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Server Dependencies",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.18.3",
+    "cfenv": "^1.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "express-enforces-ssl": "^1.1.0",
+    "express-session": "^1.15.6",
+    "form-data": "^2.4.0",
+    "ibmcloud-appid": "^5.0.0",
+    "monk": "^6.0.6",
+    "morgan": "^1.9.1",
+    "nconf": "^0.10.0",
+    "nodemon": "^1.18.9",
+    "passport": "^0.4.0"
+  }
+}
