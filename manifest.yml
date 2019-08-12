@@ -1,4 +1,4 @@
 applications:
   - name: ThinkAnIdeaServer
-    random-route: true
+    random-route: false
     memory: 128M

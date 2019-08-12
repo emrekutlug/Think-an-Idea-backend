@@ -118,10 +118,7 @@ app.use(express.static(__dirname));
 // Below URLs will be used for App ID OAuth flows
 const LOGIN_URL = "/ibm/bluemix/appid/login";
 const CALLBACK_URL = "/ibm/bluemix/appid/callback";
-// const UI_BASE_URL = "http://localhost:8080";
-const UI_BASE_URL = process.env.NODE_ENV === 'production' ?
-    'production' :
-    'http://localhost:8080';
+const UI_BASE_URL = process.env.NODE_ENV === 'production' ? 'https://thinkanidea-client.mybluemix.net' : 'http://localhost:8080';
 const LOGOUT_PAGE = "https://w3id.alpha.sso.ibm.com/pkmslogout";
 const SIGN_UP_URL = "/ibm/bluemix/appid/sign_up";
 const CHANGE_PASSWORD_URL = "/ibm/bluemix/appid/change_password";
@@ -207,7 +204,8 @@ async function checkUser(req, user) {
 
         await axios({
             method: 'POST',
-            url: 'http://localhost:1234/users/addUser',
+            //url: 'http://localhost:1234/users/addUser',
+            url: '/users/addUser',
             data: {
                 uid: userInfo.identities[0].idpUserInfo.attributes.uid,
                 firstName: userInfo.identities[0].idpUserInfo.attributes.firstName,
