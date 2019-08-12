@@ -279,9 +279,12 @@ function isLoggedIn(req, res, next) {
 app.use('/*', isLoggedIn);
 
 function getLocalConfig() {
+    /*
     if (!isLocal) {
         return {};
     }
+
+     */
     let config = {
         "clientId": "ab8cbcc6-5023-435b-a5f7-f12d74f1fa30",
         "oauthServerUrl": "https://appid-oauth.eu-de.bluemix.net/oauth/v3/64250625-8630-4d8b-ac17-a23556f36376",
