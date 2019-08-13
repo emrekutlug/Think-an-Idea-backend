@@ -305,7 +305,13 @@ function getLocalConfig() {
     });
     */
 
-    config['redirectUri'] = `http://localhost:${port}${CALLBACK_URL}`;
+    if(process.env.NODE_ENV === 'production'){
+        config['redirectUri'] = `https://thinkanidea-client.mybluemix.net${CALLBACK_URL}`;
+    }else{
+        config['redirectUri'] = `http://localhost:${port}${CALLBACK_URL}`;
+    }
+
+    //config['redirectUri'] = `http://localhost:${port}${CALLBACK_URL}`;
     return config;
 }
 
