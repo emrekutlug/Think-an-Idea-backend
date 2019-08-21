@@ -8,6 +8,7 @@ router.use('/', (req, res, next) => {
 });
 
 router.post("/addUser", (req, res) => {
+    console.log("UID", users.getUser(req.body.uid));
 
     users.getUser(req.body.uid).then((user) => {
         if (user.length === 0) {
@@ -21,7 +22,6 @@ router.post("/addUser", (req, res) => {
 
 router.get("/getUser", (req, res) => {
     users.getUser(req.query.uid).then((user) => {
-        console.log("USER:", user);
         res.status(200).json({result: user});
     }).catch((error) => {
         res.status(500).json(error);

@@ -55,14 +55,14 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-const ideaGenerationRouter = require('./ideaApi.js');
-const votingRouter = require('./votingApi');
-const resultsRouter = require('./resultsApi');
-const usersRouter = require("./userApi");
-const countdownRouter = require('./countdown.js');
+const ideaGenerationRouter = require('./IdeaGeneration/ideaApi.js');
+const votingRouter = require('./Voting/votingApi');
+const resultsRouter = require('./Result/resultsApi');
+const usersRouter = require("./User/userApi");
+const countdownRouter = require('./Coundown/countdown.js');
 const WebAppStrategy = appID.WebAppStrategy;
 
 var port = process.env.PORT || 1234;
@@ -199,13 +199,11 @@ passport.deserializeUser(function (obj, cb) {
 
 async function checkUser(req, user) {
     var accessToken = req.session[WebAppStrategy.AUTH_CONTEXT].accessToken;
-    console.log(accessToken);
     await userAttributeManager.getUserInfo(accessToken).then(async function (userInfo) {
 
         await axios({
             method: 'POST',
-            //url: 'http://localhost:1234/users/addUser',
-            url: '/users/addUser',
+            url: process.env.NODE_ENV === 'production' ? 'https://thinkanidea-server.mybluemix.net/users/addUser' : 'http://localhost:1234/users/addUser',
             data: {
                 uid: userInfo.identities[0].idpUserInfo.attributes.uid,
                 firstName: userInfo.identities[0].idpUserInfo.attributes.firstName,

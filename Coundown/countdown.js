@@ -5,12 +5,11 @@ let deadline = null;
 
 router.post("/deadline", (req, res) => {
     deadline = req.body.deadline;
-    console.log(deadline);
     res.status(200).json("Deadline updated");
 });
 
 router.get("/deadline", (req, res) => {
-    let time = getTimeRemaining(deadline)
+    let time = getTimeRemaining(deadline);
     res.status(200).json({deadline: time.total})
 });
 
