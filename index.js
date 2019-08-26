@@ -36,13 +36,16 @@ const flash = require("connect-flash");
 
 const app = express();
 
-let DYNAMIC_URL = '';
-
-if (process.env.NODE_ENV === 'production') {
-    DYNAMIC_URL = ''
-} else {
-    DYNAMIC_URL = ''
+if(process.env.NODE_ENV === 'production') {
+    app.use (function (req, res, next) {
+        if (req.secure) {
+            next();
+        } else {
+            res.status(301).redirect('https://' + req.headers.host + req.url);
+        }
+    });
 }
+
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
