@@ -27,12 +27,8 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 
-//const WebAppStrategy = require("ibmcloud-appid").WebAppStrategy;
-
-//?????????
 const log4js = require("log4js");
 const flash = require("connect-flash");
-//?????????
 
 const app = express();
 
@@ -70,32 +66,7 @@ const WebAppStrategy = appID.WebAppStrategy;
 
 var port = process.env.PORT || 1234;
 
-/*
-app.use('/', (req, res, next) => {
-	req.headers['Access-Control-Allow-Origin'] = '*';
-	res.setHeader('Access-Control-Allow-Origin', '*');
-	var accessToken = req.session[WebAppStrategy.AUTH_CONTEXT].accessToken;
 
-	console.log(accessToken);
-
-// get all attributes
-
-	userAttributeManager.getAllAttributes(accessToken).then(function (attributes) {
-		console.log(attributes);
-		res.json(attributes);
-	});
-
-
-
-	// retrieve user info
-	userAttributeManager.getUserInfo(accessToken).then(function (userInfo) {
-        console.log(userInfo);
-        req.user=userInfo
-        next();
-    });
-});
-
-*/
 app.use('/idea', ideaGenerationRouter);
 app.use('/voting', votingRouter);
 app.use('/results', resultsRouter);
@@ -108,15 +79,12 @@ const userAttributeManager = appID.UserProfileManager;
 //const userAttributeManager = appID.UserAttributeManager;
 const UnauthorizedException = appID.UnauthorizedException;
 
-//?????????????
 const logger = log4js.getLogger("testApp");
 app.use(flash());
 app.set('view engine', 'ejs'); // set up ejs for templating
 // Use static resources from /samples directory
 app.use(express.static(__dirname));
 
-
-//?????????????
 
 // Below URLs will be used for App ID OAuth flows
 const LOGIN_URL = "/ibm/bluemix/appid/login";
@@ -136,17 +104,7 @@ const isLocal = cfEnv.getAppEnv().isLocal;
 const config = getLocalConfig();
 configureSecurity();
 
-// Setup express application to use express-session middleware
-// Must be configured with proper session storage for production
-// environments. See https://github.com/expressjs/session for
-// additional documentation
-/*
-app.use(session({
-	secret: "123456",
-	resave: true,
-	saveUninitialized: true
-}));
-*/
+
 app.use(cors({credentials: true, origin: UI_BASE_URL}));
 app.use(session({
     secret: "keyboardcat",
@@ -160,22 +118,9 @@ app.use(session({
     }
 }));
 
-
 // Configure express application to use passportjs
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Configure passportjs to use WebAppStrategy
-/*
-let webAppStrategy = new WebAppStrategy({
-	tenantId: "64250625-8630-4d8b-ac17-a23556f36376",
-	clientId: "ab8cbcc6-5023-435b-a5f7-f12d74f1fa30",
-	secret: "MmMwNTAxMjQtODcwNi00ZGFlLWJjZTctNTFjY2JlMWI4ZjZi",
-	oauthServerUrl: "https://appid-oauth.eu-de.bluemix.net/oauth/v3/64250625-8630-4d8b-ac17-a23556f36376",
-	redirectUri: "http://localhost:3000" + CALLBACK_URL
-});
-passport.use(webAppStrategy);
-*/
 
 let webAppStrategy = new WebAppStrategy(config);
 passport.use(webAppStrategy);
@@ -195,10 +140,7 @@ passport.deserializeUser(function (obj, cb) {
 
 // Protected area. If current user is not authenticated - redirect to the login widget will be returned.
 // In case user is authenticated - a page with current user information will be returned.
-
 //app.get("/auth/login", passport.authenticate(WebAppStrategy.STRATEGY_NAME, {successRedirect : UI_BASE_URL, forceLogin: true}))
-
-
 
 async function checkUser(req, user) {
     var accessToken = req.session[WebAppStrategy.AUTH_CONTEXT].accessToken;
@@ -279,21 +221,11 @@ function isLoggedIn(req, res, next) {
 
 app.use('/*', isLoggedIn);
 
-function getLocalConfig() {
-    /*
-    if (!isLocal) {
-        return {};
-    }
 
-     */
-    let config = {
-        "clientId": "ab8cbcc6-5023-435b-a5f7-f12d74f1fa30",
-        "oauthServerUrl": "https://appid-oauth.eu-de.bluemix.net/oauth/v3/64250625-8630-4d8b-ac17-a23556f36376",
-        "profilesUrl": "https://appid-profiles.eu-de.bluemix.net",
-        "secret": "MmMwNTAxMjQtODcwNi00ZGFlLWJjZTctNTFjY2JlMWI4ZjZi",
-        "tenantId": "64250625-8630-4d8b-ac17-a23556f36376"
-    };
-    /*
+function getLocalConfig() {
+    //if (!isLocal) return {}
+    let config = {};
+    
     const localConfig = nconf.env().file(`${__dirname}/config.json`).get();
     const requiredParams = ['clientId', 'secret', 'tenantId', 'oauthServerUrl', 'profilesUrl'];
     requiredParams.forEach(function (requiredParam) {
@@ -304,31 +236,14 @@ function getLocalConfig() {
         }
         config[requiredParam] = localConfig[requiredParam];
     });
-    */
 
     if(process.env.NODE_ENV === 'production'){
         config['redirectUri'] = `https://thinkanidea-server.mybluemix.net${CALLBACK_URL}`;
     }else{
         config['redirectUri'] = `http://localhost:${port}${CALLBACK_URL}`;
     }
-
-    //config['redirectUri'] = `http://localhost:${port}${CALLBACK_URL}`;
     return config;
 }
-
-/*
-async function getAppIdentityToken() {
-	try {
-		const tokenResponse = await tokenManager.getApplicationIdentityToken();
-		console.log('Token response : ' + JSON.stringify(tokenResponse));
-
-		//the token response contains the access_token, expires_in, token_type
-	} catch (err) {
-		console.log('err obtained : ' + err);
-		res.status(500).send(err.toString());
-	}
-}
-*/
 
 app.get('/getAllAttributes', (req, res, next) => {
     var accessToken = req.session[WebAppStrategy.AUTH_CONTEXT].accessToken;
@@ -338,106 +253,6 @@ app.get('/getAllAttributes', (req, res, next) => {
         res.status(200).json({userInfo:userInfo});
     }).catch(err => console.log("ERR", err));
 });
-
-
-/*
-// Explicit login endpoint. Will always redirect browser to login widget due to {forceLogin: true}.
-// If forceLogin is set to false redirect to login widget will not occur of already authenticated users.
-app.get(LOGIN_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	forceLogin: true
-}));
-
-// Explicit forgot password endpoint. Will always redirect browser to forgot password widget screen.
-app.get(FORGOT_PASSWORD_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	show: WebAppStrategy.FORGOT_PASSWORD
-}));
-
-// Explicit change details endpoint. Will always redirect browser to change details widget screen.
-app.get(CHANGE_DETAILS_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	show: WebAppStrategy.CHANGE_DETAILS
-}));
-
-// Explicit change password endpoint. Will always redirect browser to change password widget screen.
-app.get(CHANGE_PASSWORD_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	show: WebAppStrategy.CHANGE_PASSWORD
-}));
-
-// Explicit sign up endpoint. Will always redirect browser to sign up widget screen.
-// default value - false
-app.get(SIGN_UP_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	show: WebAppStrategy.SIGN_UP
-}));
-
-// Explicit anonymous login endpoint. Will always redirect browser for anonymous login due to forceLogin: true
-app.get(LOGIN_ANON_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	allowAnonymousLogin: true,
-	allowCreateNewAnonymousUser: true
-}));
-
-// Callback to finish the authorization process. Will retrieve access and identity tokens/
-// from App ID service and redirect to either (in below order)
-// 1. the original URL of the request that triggered authentication, as persisted in HTTP session under WebAppStrategy.ORIGINAL_URL key.
-// 2. successRedirect as specified in passport.authenticate(name, {successRedirect: "...."}) invocation
-// 3. application root ("/")
-app.get(CALLBACK_URL, passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-
-// Logout endpoint. Clears authentication information from session
-/*
-app.get(LOGOUT_URL, function(req, res){
-	WebAppStrategy.logout(req);
-	res.redirect(UI_BASE_URL);
-});
-*/
-
-/*
-
-function storeRefreshTokenInCookie(req, res, next) {
-	const refreshToken = req.session[WebAppStrategy.AUTH_CONTEXT].refreshToken;
-	if (refreshToken) {
-		res.cookie("refreshToken", refreshToken, {});
-	}
-	next();
-}
-
-/*
-function isLoggedIn(req) {
-	return req.session[WebAppStrategy.AUTH_CONTEXT];
-}
-*/
-// Protected area. If current user is not authenticated - redirect to the login widget will be returned.
-// In case user is authenticated - a page with current user information will be returned.
-/*
-app.get("/protected", function tryToRefreshTokenIfNotLoggedIn(req, res, next) {
-	if (isLoggedIn(req)) {
-		return next();
-	}
-
-	webAppStrategy.refreshTokens(req, req.cookies.refreshToken).then(next, next);
-}, passport.authenticate(WebAppStrategy.STRATEGY_NAME), storeRefreshTokenInCookie, function(req, res) {
-	logger.debug("/protected");
-	res.json(req.user);
-});
-*/
-
-/*
-app.post("/rop/login/submit", bodyParser.urlencoded({extended: false}), passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
-	successRedirect: UI_BASE_URL,
-	failureRedirect: ROP_LOGIN_PAGE_URL,
-	failureFlash : true // allow flash messages
-}));
-
-app.get(ROP_LOGIN_PAGE_URL, function(req, res) {
-	// render the page and pass in any flash data if it exists
-	res.render("login.ejs", { message: req.flash('error') });
-});
-
-*/
 
 
 app.listen(port, function () {
@@ -453,7 +268,6 @@ function configureSecurity() {
         app.use(express_enforces_ssl());
     }
 }
-
 
 module.exports = {
     WebAppStrategy

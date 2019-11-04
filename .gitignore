@@ -7,6 +7,8 @@
 # $ git config --global mergetool.keepBackup false
 *.orig
 
+config.json
+
 #packegelockjson
 package-lock.json
 

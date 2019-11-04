@@ -1,28 +1,8 @@
 const monk = require('monk');
-const MONGODB_URL = "mongodb://admin:CMRMZIXTKGBKQYBG@portal-ssl730-43.bmix-dal-yp-d6975d40-c401-49cc-a500-ad4b98d432d4.421838044.composedb.com:16890,portal-ssl714-42.bmix-dal-yp-d6975d40-c401-49cc-a500-ad4b98d432d4.421838044.composedb.com:16890/mydb?authSource=admin&ssl=true";
+const nconf = require("nconf");
+const MONGODB_URL = nconf.env().file(`${__dirname}/../config.json`).get("MONGODB_URL");
 const db = monk(MONGODB_URL);
 const ideas = db.get('ideas');
-
-//const Joi = require('joi');
-//const collection = db.collection;
-// * username - default to anonymous
-// * subject
-// * message
-// * imageURL
-// * created
-
-/*
-const schema = Joi.object().keys({
-    username: Joi.string().alphanum().required(),
-    subject: Joi.string().required(),
-    message: Joi.string().max(500).required(),
-    imageURL: Joi.string().uri({
-      scheme: [
-        /https?/
-      ]
-    })
-  });
-*/
 
 function getAll(){
     return ideas.find({}, {_id: 1, title: 1, body: 1, creator: 1, leader: 1, members: 1, date: 1, isActive: 1, reason: 1})

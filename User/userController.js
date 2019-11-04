@@ -1,5 +1,6 @@
 const monk = require('monk');
-const MONGODB_URL = "mongodb://admin:CMRMZIXTKGBKQYBG@portal-ssl730-43.bmix-dal-yp-d6975d40-c401-49cc-a500-ad4b98d432d4.421838044.composedb.com:16890,portal-ssl714-42.bmix-dal-yp-d6975d40-c401-49cc-a500-ad4b98d432d4.421838044.composedb.com:16890/mydb?authSource=admin&ssl=true";
+const nconf = require("nconf");
+const MONGODB_URL = nconf.env().file(`${__dirname}/../config.json`).get("MONGODB_URL");
 const db = monk(MONGODB_URL);
 const users = db.get('users');
 
